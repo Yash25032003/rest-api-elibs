@@ -2,6 +2,8 @@ import express, { NextFunction, Request, Response } from "express";
 import createHttpError, { HttpError } from "http-errors";
 import { config } from "./config/config";
 import globalErrorHandler from "./middleware/globalErrorHandler";
+import userRouter from "./user/userRouter";
+
 
 const app = express();
 
@@ -17,5 +19,7 @@ app.get("/", (req, res, next) => {
 // global handler
 
 // app.use(globalErrorHandler);
+
+app.use("/api/users", userRouter);
 
 export default app;

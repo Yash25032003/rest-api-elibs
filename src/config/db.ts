@@ -14,6 +14,7 @@ const connectDB = async () => {
     await mongoose.connect(config.databaseurl as string);
   } catch (error) {
     console.error("Failed to connect to DB", error);
+    // stopping the server agar error aa gaya initially
     process.exit(1);
   }
 };
