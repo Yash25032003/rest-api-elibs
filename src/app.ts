@@ -10,7 +10,7 @@ const app = express();
 //routes
 // http methods : PUT , POST , GET , DELETE , PATCH
 
-app.get("/", (req, res, next) => {
+app.get("/", (req, res, next) => { 
   const error = createHttpError(400, "something went wrong");
   throw error;
   res.json({ message: "welcome to the rest api course" });
