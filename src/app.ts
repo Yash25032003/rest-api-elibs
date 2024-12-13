@@ -7,6 +7,9 @@ import userRouter from "./user/userRouter";
 
 const app = express();
 
+//? This middleware is essential for handling data sent in the body of requests
+app.use(express.json())
+
 //routes
 // http methods : PUT , POST , GET , DELETE , PATCH
 
