@@ -77,7 +77,6 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 
   // find user in DB
-
   try {
     const user = await userModel.findOne({ email: email });
     if (!user) {
