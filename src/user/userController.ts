@@ -4,6 +4,7 @@ import userModel from "./userModel";
 import bcrypt from "bcrypt";
 import { sign } from "jsonwebtoken";
 import { config } from "../config/config";
+import { User } from "./userTypes";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   // steps in handling requests
@@ -17,32 +18,54 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     //! The next function is used to pass the error object to the next middleware
     return next(error);
   }
-  res.json({ message: "User registered successfully" });
+  // res.json({ message: "User registered successfully" });
 
   // Database call
-  const user = await userModel.findOne({ email: email }); // finding email in DB
+  try {
+    const user = await userModel.findOne({ email: email }); // finding email in DB
 
-  // if email existed in DB
-  if (user) {
-    const error = createHttpError(400, "User already existed");
+    // if email existed in DB
+    if (user) {
+      // const error = createHttpError(400, "User already existed");
+      // return next(error);
+
+      res.status(400).json({ message: "User already exist" });
+    }
+  } catch (err) {
+    return next(createHttpError(500, "Error while getting user"));
   }
 
+  let newUser: User;
+
   // password hash
-  const hashedPassword = await bcrypt.hash(password, 10);
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  const newUser = userModel.create({
-    name,
-    email,
-    password: hashedPassword,
-  });
+    newUser = await userModel.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
+  } catch (err) {
+    return next(createHttpError(500, "error while creating user"));
+    // res.status(500).json({ message: "error while creating user" });
+  }
 
-  // token generation jwt
-  const token = sign({ sub: (await newUser)._id }, config.jwtsecret as string, {
-    expiresIn: "7d",
-  });
+  try {
+    // token generation jwt
+    const token = sign(
+      { sub: (await newUser)._id },
+      config.jwtsecret as string,
+      {
+        expiresIn: "7d",
+      }
+    );
 
-  // response
-  res.json({ accessToken: token });
+    // response
+    res.json({ accessToken: token });
+  } catch (err) {
+    return next(createHttpError(500, "error while signing the jwt token"));
+  }
 };
 
 export { createUser };
