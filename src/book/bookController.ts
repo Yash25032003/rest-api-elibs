@@ -45,13 +45,13 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
       }
     );
 
-    // Database me send kar rahe hai newBook ko jo user ne cloudinary pe upload ki hai 
+    // Database me send kar rahe hai newBook ko jo user ne cloudinary pe upload ki hai
     const newBook = await bookModel.create({
       title,
       genre,
       author: "675ebacf999105d831382f23",
-      coverImage: uploadResult.secure_url,
-      file: bookFileUploadResult.secure_url,
+      coverImage: uploadResult.secure_url, // access coverImage from cloudinary
+      file: bookFileUploadResult.secure_url, // access file from cloudinary
     });
 
     // delete temperory files after uploading of files is completed
@@ -66,6 +66,10 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
 
     console.log("Uploaded file", uploadResult);
     console.log("Uploaded file", bookFileUploadResult);
+    // @ts-ignore
+    console.log("userId" , req.userId);
+    
+
 
     // res.json({ message: "Files Submiitted" });
   } catch (error) {
