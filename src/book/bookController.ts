@@ -91,6 +91,7 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
   if (!book) {
     return next(createHttpError(404, "Book not found"));
   }
+
   // check access means jo book me changes kar raha hai vo ushi ki book hai na
 
   const _req = req as AuthRequest;
@@ -147,6 +148,12 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
 
     completeFileName = uploadResultPdf.secure_url;
     await fs.promises.unlink(bookFilePath);
+
+    // const coverFileSplit = book.coverImage.split("/");
+    // const coverImagePublicId =
+    //   coverFileSplit.at(-2) + "/" + coverFileSplit.at(-1)?.split(".").at(-2);
+
+    //   await cloudinary.uploader.destroy(coverImagePublicId);
   }
 
   const updatedBook = await bookModel.findOneAndUpdate(
