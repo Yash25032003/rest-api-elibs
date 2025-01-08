@@ -200,4 +200,52 @@ const getSingleBook = async (
   }
 };
 
-export { createBook, updateBook, listBooks, getSingleBook };
+const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
+  const bookId = req.params.bookId;
+
+  // check ki book hai bhi ki nahi DB me
+  const book = await bookModel.findOne({ _id: bookId });
+  if (!book) {
+    return next(createHttpError(404, "Book not found in the DB"));
+  }
+  // check ki ye user book ko delete kar sakta hai ki nahi
+
+  const _req = req as AuthRequest;
+  if (book.author.toString() !== _req.userId) {
+    return next(createHttpError(403, "You cannot access these book"));
+  }
+
+  // now hame cloudinary se delete karna hai image ko
+  // access the image ki id from url
+  // handling the images
+
+  const coverFileSplit = book.coverImage.split("/");
+  // jis format me cloudinary me hai wese hi hum access kar rahe hai
+  const coverImagePublicId =
+    coverFileSplit.at(-2) + "/" + coverFileSplit.at(-1)?.split(".").at(-2); // .png nahi chahiye the hame because cloudinary me nahi tha vo
+
+  // console.log("Split is ", coverFileSplit);
+  console.log("final Split is ", coverImagePublicId);
+
+  // handling the files
+  const bookFileSplits = book.file.split("/");
+  const bookFilePublicId = bookFileSplits.at(-2) + "/" + bookFileSplits.at(-1); //.pdf chahiye to usse rakhenge split nahi karenge
+
+  console.log("book File Id", bookFilePublicId);
+
+  try {
+    // deleted fro cloudinary
+    await cloudinary.uploader.destroy(coverImagePublicId);
+    await cloudinary.uploader.destroy(bookFilePublicId, {
+      resource_type: "raw",
+    });
+
+    // DB se delete karo
+    await bookModel.deleteOne({ _id: bookId });
+    res.json({ message: "deleted book is", bookId });
+  } catch (error) {
+    return next(createHttpError(403, "Resource not deleted from cloudinary"));
+  }
+};
+
+export { createBook, updateBook, listBooks, getSingleBook, deleteBook };
