@@ -110,14 +110,14 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
       const converMimeType = files.coverImage[0].mimetype.split("/").at(-1);
       // send files to cloudinary
       const filePath = path.resolve(
-          __dirname,
-          "../../public/data/uploads/" + filename
+        __dirname,
+        "../../public/data/uploads/" + filename
       );
       completeCoverImage = filename;
       const uploadResult = await cloudinary.uploader.upload(filePath, {
-          filename_override: completeCoverImage,
-          folder: "book-covers",
-          format: converMimeType,
+        filename_override: completeCoverImage,
+        folder: "book-covers",
+        format: converMimeType,
       });
 
       completeCoverImage = uploadResult.secure_url;
@@ -166,4 +166,17 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
   res.json(updatedBook);
 };
 
-export { createBook, updateBook };
+const listBooks = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // In production grade hum pagination ka use karte hai
+    // accessing the entries int he DB of books
+    const book = await bookModel.find();
+
+    res.json(book);
+  } catch (error) {
+    return next(createHttpError(500, "Error while accesing the book"));
+  }
+  // res.json({ message: "listbooks" });
+};
+
+export { createBook, updateBook, listBooks };

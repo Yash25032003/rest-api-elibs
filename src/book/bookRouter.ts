@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import path from "node:path";
-import { createBook, updateBook } from "./bookController";
+import { createBook, listBooks, updateBook } from "./bookController";
 import authenticate from "../middleware/authenticate";
 const bookRouter = express.Router();
 
@@ -27,11 +27,15 @@ bookRouter.post(
 bookRouter.patch(
   "/:bookId", // dynamically pass kiya hai hamne bookId ko by using :
   authenticate, // middleware to check users authentication
+
+  // below middleware is from Multer and is used to handle file uploads. fields allows uploading multiple files with different field names
   upload.fields([
     { name: "coverImage", maxCount: 1 },
     { name: "file", maxCount: 1 },
   ]),
   updateBook
 );
+
+bookRouter.get('/' ,listBooks )
 
 export default bookRouter;
