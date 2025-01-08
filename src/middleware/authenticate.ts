@@ -3,6 +3,7 @@ import createHttpError from "http-errors";
 import { verify } from "jsonwebtoken";
 import { config } from "../config/config";
 
+//attaching a new metadat in the request by creating a interface 
 export interface AuthRequest extends Request {
   userId: string;
 }

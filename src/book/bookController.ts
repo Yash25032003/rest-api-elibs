@@ -4,6 +4,7 @@ import path from "node:path";
 import createHttpError from "http-errors";
 import bookModel from "./bookModel";
 import fs from "node:fs";
+import { AuthRequest } from "../middleware/authenticate";
 
 const createBook = async (req: Request, res: Response, next: NextFunction) => {
   console.log("files", req.files);
@@ -45,11 +46,13 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
       }
     );
 
+    const _req = req as AuthRequest;
+
     // Database me send kar rahe hai newBook ko jo user ne cloudinary pe upload ki hai
     const newBook = await bookModel.create({
       title,
       genre,
-      author: "675ebacf999105d831382f23",
+      author: _req.userId,
       coverImage: uploadResult.secure_url, // access coverImage from cloudinary
       file: bookFileUploadResult.secure_url, // access file from cloudinary
     });
@@ -66,10 +69,7 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
 
     console.log("Uploaded file", uploadResult);
     console.log("Uploaded file", bookFileUploadResult);
-    // @ts-ignore
-    console.log("userId" , req.userId);
-    
-
+    console.log("userId", _req.userId);
 
     // res.json({ message: "Files Submiitted" });
   } catch (error) {
