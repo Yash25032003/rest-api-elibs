@@ -4,8 +4,14 @@ import { config } from "./config/config";
 import globalErrorHandler from "./middleware/globalErrorHandler";
 import userRouter from "./user/userRouter";
 import bookRouter from "./book/bookRouter";
+import cors from "cors";
 
 const app = express();
+app.use(
+  cors({
+    origin: config.frontendDomain,
+  })
+);
 
 //? This middleware is essential for handling data sent in the body of requests
 app.use(express.json());
