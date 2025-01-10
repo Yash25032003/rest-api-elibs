@@ -177,7 +177,7 @@ const listBooks = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // In production grade hum pagination ka use karte hai
     // accessing the entries int he DB of books
-    const book = await bookModel.find();
+    const book = await bookModel.find().populate("author", "name"); // populate method se hum author ke andar kya kya fiels chahite hai access karna vo kar sakte hai jese yaha hum name ko kar rahe hai
 
     res.json(book);
   } catch (error) {
@@ -195,7 +195,9 @@ const getSingleBook = async (
   const bookId = req.params.bookId;
 
   try {
-    const book = await bookModel.findOne({ _id: bookId });
+    const book = await bookModel
+      .findOne({ _id: bookId })
+      .populate("author", "name");
     if (!book) {
       return next(createHttpError(403, "Book not found in the DB"));
     }
